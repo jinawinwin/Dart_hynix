@@ -1,0 +1,9 @@
+{
+  "companies": [
+    {
+      "name": "SK하이닉스",
+      "stock_code": "000660",
+      "enabled": true
+    }
+  ]
+}
