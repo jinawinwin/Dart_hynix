@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       year:
-        description: 사업연도(예: 2025)
+        description: "사업연도(예: 2025)"
         required: true
         default: "2025"
       report_code:
-        description: 11011 사업 / 11012 반기 / 11013 1분기 / 11014 3분기
+        description: "11011 사업 / 11012 반기 / 11013 1분기 / 11014 3분기"
         required: true
         default: "11011"
   schedule:
