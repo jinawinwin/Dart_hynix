@@ -1,0 +1,55 @@
+name: OpenDART financial sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 사업연도(예: 2025)
+        required: true
+        default: "2025"
+      report_code:
+        description: 11011 사업 / 11012 반기 / 11013 1분기 / 11014 3분기
+        required: true
+        default: "11011"
+  schedule:
+    - cron: "0 23 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: OpenDART 데이터 수집 - 수동 실행
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: >-
+          python -m src.main
+          --year "${{ inputs.year }}"
+          --report-code "${{ inputs.report_code }}"
+          --fs-div CFS
+
+      - name: OpenDART 데이터 수집 - 예약 실행
+        if: github.event_name == 'schedule'
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          BUSINESS_YEAR=$(( $(date -u +%Y) - 1 ))
+          python -m src.main --year "$BUSINESS_YEAR" --report-code 11011 --fs-div CFS
+
+      - name: 변경 데이터 커밋
+        run: |
+          git config user.name "financial-data-bot"
+          git config user.email "financial-data-bot@users.noreply.github.com"
+          git add data reports
+          git diff --cached --quiet && exit 0
+          git commit -m "data: update OpenDART financial statements"
+          git push
