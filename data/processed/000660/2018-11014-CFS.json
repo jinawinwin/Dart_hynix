@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "company": "SK하이닉스",
+    "stock_code": "000660",
+    "corp_code": "00164779",
+    "business_year": "2018",
+    "report_code": "11014",
+    "fs_div": "CFS",
+    "generated_at": "2026-09-27T03:04:24.668376+00:00"
+  },
+  "metrics": {
+    "revenue": 11416788000000,
+    "operating_profit": 6472420000000,
+    "net_income": 4692193000000,
+    "assets": 57377252000000,
+    "liabilities": 13888426000000,
+    "equity": 43488826000000,
+    "cash": 2340357000000,
+    "operating_cash_flow": 15256517000000,
+    "operating_margin_pct": 56.69,
+    "net_margin_pct": 41.1,
+    "debt_ratio_pct": 31.94,
+    "data_quality_note": "본 스타터는 대표 계정명 기준 요약입니다. 운영 환경에서는 account_id 기반 매핑, 누적 분기 조정, 평균잔액 및 정정공시 처리가 필요합니다."
+  }
+}
