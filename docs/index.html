@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenDART 기반 SK하이닉스 재무분석 대시보드">
+  <title>SK하이닉스 재무분석</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav wrap" aria-label="주요 링크">
+      <a class="brand" href="./"><span class="brand-mark">H</span> SK hynix Financial</a>
+      <a class="repo-link" href="https://github.com/jinawinwin/Dart_hynix">GitHub 저장소 ↗</a>
+    </nav>
+    <div class="hero-content wrap">
+      <p class="eyebrow">OPEN DART · 2010—PRESENT</p>
+      <h1>숫자 너머의 흐름을<br>한눈에 읽습니다.</h1>
+      <p class="hero-copy">사업·반기·분기보고서에서 추출한 SK하이닉스의 핵심 재무 흐름입니다. 연결재무제표를 우선 사용하며 매월 1일 자동 갱신합니다.</p>
+      <div class="status-row">
+        <span class="status"><i></i> 자동 업데이트</span>
+        <span id="updatedAt">데이터 확인 중</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="section summary" aria-labelledby="summaryTitle">
+      <div class="section-heading">
+        <div><p class="kicker">LATEST ANNUAL</p><h2 id="summaryTitle">최근 연간 핵심 지표</h2></div>
+        <span id="latestPeriod" class="period-chip">—</span>
+      </div>
+      <div id="summaryCards" class="cards"></div>
+    </section>
+
+    <section class="section charts" aria-labelledby="trendTitle">
+      <div class="section-heading">
+        <div><p class="kicker">LONG-TERM VIEW</p><h2 id="trendTitle">연간 실적 추이</h2></div>
+        <p class="unit">단위: 조원 / %</p>
+      </div>
+      <div class="chart-grid">
+        <article class="chart-card">
+          <div class="chart-title"><h3>손익 성장</h3><div class="legend"><span class="revenue">매출</span><span class="profit">영업이익</span><span class="income">순이익</span></div></div>
+          <div id="incomeChart" class="chart" role="img" aria-label="연도별 매출, 영업이익, 순이익 추이"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title"><h3>수익성 · 안정성</h3><div class="legend"><span class="margin">영업이익률</span><span class="debt">부채비율</span></div></div>
+          <div id="ratioChart" class="chart" role="img" aria-label="연도별 영업이익률과 부채비율 추이"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section data-section" aria-labelledby="dataTitle">
+      <div class="section-heading">
+        <div><p class="kicker">DISCLOSURE DATA</p><h2 id="dataTitle">보고서별 상세 수치</h2></div>
+        <p class="unit">금액: 억원</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="보고서 분류">
+        <button role="tab" aria-selected="true" data-category="annual">Annual <b id="annualCount">0</b></button>
+        <button role="tab" aria-selected="false" data-category="half-year">Half-year <b id="half-yearCount">0</b></button>
+        <button role="tab" aria-selected="false" data-category="quarterly">Quarterly <b id="quarterlyCount">0</b></button>
+      </div>
+      <div class="table-shell">
+        <table>
+          <thead><tr><th>기준</th><th>구분</th><th>매출액</th><th>영업이익</th><th>순이익</th><th>자산</th><th>자본</th><th>영업이익률</th><th>부채비율</th></tr></thead>
+          <tbody id="financialTable"></tbody>
+        </table>
+      </div>
+      <p id="emptyState" class="empty" hidden>아직 수집된 데이터가 없습니다.</p>
+    </section>
+  </main>
+
+  <footer><div class="wrap"><p>공시 원천: 금융감독원 OpenDART · 투자 판단을 위한 최종 근거가 아닙니다.</p><p>© SK hynix Financial Dashboard</p></div></footer>
+  <script src="dashboard-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

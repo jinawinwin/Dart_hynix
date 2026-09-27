@@ -15,7 +15,9 @@ BASE_URL = "https://opendart.fss.or.kr/api"
 
 
 class DartAPIError(RuntimeError):
-    pass
+    def __init__(self, message: str, *, status: str | None = None) -> None:
+        super().__init__(message)
+        self.status = status
 
 
 class DartClient:
@@ -38,7 +40,8 @@ class DartClient:
         status = payload.get("status")
         if status != "000":
             raise DartAPIError(
-                f"OpenDART 오류 status={status}: {payload.get('message', '알 수 없는 오류')}"
+                f"OpenDART 오류 status={status}: {payload.get('message', '알 수 없는 오류')}",
+                status=status,
             )
         return payload
 

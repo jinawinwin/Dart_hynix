@@ -1,24 +1,31 @@
-name: OpenDART financial sync
+name: OpenDART data and dashboard
 
 on:
   workflow_dispatch:
     inputs:
-      year:
-        description: "사업연도(예: 2025)"
+      from_year:
+        description: "수집 시작연도"
         required: true
-        default: "2025"
-      report_code:
-        description: "11011 사업 / 11012 반기 / 11013 1분기 / 11014 3분기"
+        default: "2010"
+      to_year:
+        description: "수집 종료연도"
         required: true
-        default: "11011"
+        default: "2026"
   schedule:
-    - cron: "0 23 * * 1-5"
+    # 매월 1일 00:15 UTC (한국시간 09:15)
+    - cron: "15 0 1 * *"
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  update:
+  collect-and-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,29 +34,54 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: OpenDART 데이터 수집 - 수동 실행
-        if: github.event_name == 'workflow_dispatch'
+      - name: 수집 범위 계산
+        id: range
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "from_year=${{ inputs.from_year }}" >> "$GITHUB_OUTPUT"
+            echo "to_year=${{ inputs.to_year }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "from_year=2010" >> "$GITHUB_OUTPUT"
+            echo "to_year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 사업·반기·분기보고서 수집
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: >-
           python -m src.main
-          --year "${{ inputs.year }}"
-          --report-code "${{ inputs.report_code }}"
-          --fs-div CFS
+          --from-year "${{ steps.range.outputs.from_year }}"
+          --to-year "${{ steps.range.outputs.to_year }}"
+          --all-reports
+          --fs-div AUTO
+          --continue-on-error
 
-      - name: OpenDART 데이터 수집 - 예약 실행
-        if: github.event_name == 'schedule'
-        env:
-          DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: |
-          BUSINESS_YEAR=$(( $(date -u +%Y) - 1 ))
-          python -m src.main --year "$BUSINESS_YEAR" --report-code 11011 --fs-div CFS
+      - name: 정적 대시보드 데이터 생성
+        run: python -m src.build_dashboard
 
       - name: 변경 데이터 커밋
         run: |
           git config user.name "financial-data-bot"
           git config user.email "financial-data-bot@users.noreply.github.com"
-          git add data reports
+          git add data reports docs/dashboard-data.js
           git diff --cached --quiet && exit 0
-          git commit -m "data: update OpenDART financial statements"
+          git commit -m "data: monthly OpenDART update"
           git push
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: collect-and-build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages 배포
+        id: deployment
+        uses: actions/deploy-pages@v4
